@@ -1,0 +1,72 @@
+{% extends "layouts/layout.html" %}
+
+{% block title %}
+    Liste des todos
+{% endblock %}
+
+{% block content %}
+    <div class="create_todo">
+        <form class="form post_todo">
+            <input class="input" type="text" id="title" name="title" placeholder="Entrez le titre de la tâche">
+            <textarea class="textarea" id="description" name="description" rows="3" placeholder="Entrez la description de la tâche"></textarea> 
+            <center><button class="button" type="submit">Valider</button></center>
+        </form>
+    </div>
+    <div class="box todolist">
+        {% for todo in todos %}
+            <div class="todo">
+                <div class="title">
+                    <div>{{ todo['title'] }}</div>
+                    <div>{% if todo['status'] == 0 %}
+                        <div>En cours</div>
+                    {% else %}
+                        <div>Terminé</div>
+                    {% endif %}</div>
+                </div>
+                <div class="content">
+                    <div>{{ todo['description'] }}</div>
+                    
+                    <div>{% if todo['due'] > datetime.utcnow().strftime('%Y-%m-%d') %}
+                        <div style="background-color: blue; color: white;">En cours</div>
+                    {% else %}
+                        <div style="background-color: red; color: white;">Expiré</div>
+                    {% endif %}</div>
+                    
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        let form = document.getElementsByClassName('post_todo')[0];
+        form.addEventListener('submit',save_todo);
+        function save_todo(event){
+            event.preventDefault();
+            
+            let title =document.getElementById('title').value;
+            let description = document.getElementById('description').value;
+            let status =0;
+            let due = "2023-05-15";
+            let data = {title
+                        ,description
+                        ,status
+                        ,due};
+                console.log(data);
+            fetch('/todos',{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            location.href = '/todos';
+            
+
+        }
+    </script>
+{% endblock %}
